@@ -80,7 +80,7 @@ A partir de la adquisión de la señal se procede a implementar un codgio en Pyt
 Este repositorio contiene el desarrollo y los resultados del análisis electromiográfico realizado a partir de un archivo CSV de señal EMG.  
 El código implementa **filtrado digital**, **ventaneo**, **análisis espectral**, **detección de fatiga** y **evaluación estadística** entre ventanas según los criterios del laboratorio.  
 
-
+# CODIGO IMPLEMENTADO PARA EL ANALISIS DE LAS EMG 
 
 # Descripción general del proceso
 
