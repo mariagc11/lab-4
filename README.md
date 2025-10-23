@@ -190,8 +190,16 @@ Se observan picos notables entre **50 Hz y 120 Hz**, correspondientes a la activ
 La ausencia de desplazamiento del espectro hacia frecuencias bajas indica que la energía de la señal se mantiene estable y que el músculo conserva su capacidad de contracción sin deterioro en la respuesta eléctrica.
 
 ---
+### 1️⃣1️⃣ FFT POR VENTANAS 
+<img width="1211" height="595" alt="image" src="https://github.com/user-attachments/assets/87d1068a-d198-4b41-9f00-e2cd56e0747c" />
+aca vemos com se aplico la FFT para cada ventana, por lo que cemos la divicion de cada una de estas viendo que su duracion es de 0.5s y superpuesta una en otra a la mitad para evitar la perdida de informaion, donde lo que nos intereza ver es el cambio de potencia para cada ventana, que nos indica que tan fuerte es la frecuencia en esa ventana, y viendo la forma de cada curva sin un aparente cambio podemos saber que la señal es estable ( sin fatiga o con fatiga  ) dependiendo de la potenca por ventana 
+---
+### 1️⃣2️⃣️ COMPARACION DE VENTANAS DE INICIO, MEDIO Y FINAL 
+<img width="1208" height="608" alt="image" src="https://github.com/user-attachments/assets/ff4a36cd-e758-4812-a2c3-35f75b75ee45" />
+Ahora con lo antes visto vemos la comparacion entre la ventana inicial, la del medio y la final con lo cual podemos concluir que por lo visto en la curva azul, se tiene que la señal tiene una potencia alta entre los 20 y 200 Hz que es la concentracion normal de frecuencia en la señal EMG tomada, ahora en la curva naranja vemos como se da parcialmente la baja de potencia que nos indica que el musculo se empesara a fatigar y por ultimo en la curva verde vemos la bajada de potencia drastica donde concluimos que el musculo se fatiga 
 
-### 1️⃣1️⃣ Mapa espectral (ventanas de 0.5 s, 50 % de solape)
+---
+### 1️⃣3️⃣ Mapa espectral (ventanas de 0.5 s, 50 % de solape)
 ![Imagen de WhatsApp 2025-10-22 a las 19 45 23_6c335f8a](https://github.com/user-attachments/assets/436f2faa-2327-49e1-bd40-7bee27d80661)
 
 El mapa espectral de alta resolución muestra la **variación temporal de la potencia en función de la frecuencia** para las 366 ventanas cortas generadas.  
