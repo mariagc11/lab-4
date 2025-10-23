@@ -36,6 +36,15 @@ La fatiga muscular se caracteriza por una disminución progresiva en la capacida
 9. Importancia en ingeniería biomédica:
 El análisis de señales EMG es fundamental en la ingeniería biomédica, ya que permite evaluar el rendimiento muscular, identificar signos de fatiga y desarrollar sistemas de rehabilitación y diagnóstico basados en el monitoreo de la actividad eléctrica muscular.
 
+10:En señales biológicas como EMG, se busca capturar la energía global de cada ventana y observar cómo cambia la distribución de frecuencias en el tiempo (por ejemplo, para estudiar fatiga).
+En estos casos, la ventana Hann:
+
+Reduce mejor la fuga espectral (leakage) entre bandas.
+
+Tiene una forma más “natural” para analizar energía muscular (sin introducir tanto sesgo en la amplitud real).
+
+Suprime los bordes de manera más suave, lo que ayuda cuando se aplican muchas FFT consecutivas .
+
 # METODOLOGÍA 
 
 Instrumentación y prepación del sujeto de prueba 
