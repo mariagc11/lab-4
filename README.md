@@ -69,7 +69,7 @@ Para la adquisicón de la señal se realiza una interfaz de adquisión directame
 
 <img width="785" height="632" alt="image" src="https://github.com/user-attachments/assets/178e3f6e-2bd5-4368-b1b3-a83dc24a19dd" />
 
-La frecuencia de muestreo fue de 100 Hz, garantizando una resolución temporal suficiente para capturar los componentes de la señal electromiográfica. Durante la prueba, el sujeto realizo una contracción sostenida del gastrocnemio al ponerse repetidamente en puntas, manteniendo la posición hasta la aparición de una sencación de fatiga. 
+La frecuencia de muestreo fue de 100 Hz, garantizando una resolución temporal suficiente para capturar los componentes de la señal electromiográfica. Durante la prueba, el sujeto realizo una contracción sostenida del gastrocnemio al ponerse repetidamente en puntas, manteniendo la posición hasta la aparición de una sensación de fatiga. 
 
 La señal fue registrada de manera continua y en tiempo real, obteniéndo un archivo excel de la señal cruda, mostrando el comportamiento inicial y el posterior filtrado digital.
 
