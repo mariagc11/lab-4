@@ -52,7 +52,7 @@ Instrumentación y prepación del sujeto de prueba
     
   * Un electrodo de tierra colocado en la rodilla donde ahi zona ósea no activa, este seria el boton verde.
 
-* Se verifica la correcta conexión al sistema de adquisición como lo es el 
+* Se verifica la correcta conexión al sistema de adquisición como lo es el modulo EMG y la DAQ, al software de procesamiento en Python. 
 
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 44_dd302a35](https://github.com/user-attachments/assets/b636bb70-461b-48c4-9d52-3cf43fdf248f)
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 45_50e3dbd0](https://github.com/user-attachments/assets/992fb53c-5d37-4a03-ab3b-fbc765bfa701)
