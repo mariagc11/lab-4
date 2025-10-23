@@ -75,14 +75,14 @@ La señal fue registrada de manera continua y en tiempo real, obteniéndo un arc
 
 A partir de la adquisión de la señal se procede a implementar un codgio en Python donde se realizan los correspondientes analisis. 
 
-# Análisis de Señales Electromiográficas (EMG)
+# ANÁLISIS DE SEALES ELECTROMIOGRÁFICAS (EMG)
 
 Este repositorio contiene el desarrollo y los resultados del análisis electromiográfico realizado a partir de un archivo CSV de señal EMG.  
 El código implementa **filtrado digital**, **ventaneo**, **análisis espectral**, **detección de fatiga** y **evaluación estadística** entre ventanas según los criterios del laboratorio.  
 
 # CODIGO IMPLEMENTADO PARA EL ANALISIS DE LAS EMG 
 
-# Descripción general del proceso
+# DESCRIPCIÓN GENERAL DEL PROCESO 
 
 El script realiza los siguientes pasos:
 1. **Lectura del archivo EMG (.csv)** y cálculo de la frecuencia de muestreo.
