@@ -1,4 +1,47 @@
-# lab-4
+# lab-4 SEÑALES ELECTROMIOGRAFICAS (EMG)
+
+# INTRODUCCIÓN 
+El estudio de las señales electromiográficas (EMG) permite analizar la actividad eléctrica generada por los músculos durante la contracción, proporcionando información fundamental sobre su funcionamiento y estado de fatiga. Estas señales se registran mediante electrodos de superficie ubicados sobre la piel, que capturan los potenciales eléctricos producidos por las fibras musculares. A través del procesamiento digital de estas señales, es posible aplicar filtros y técnicas de análisis espectral, como la Transformada Rápida de Fourier (FFT), para observar la variación en la frecuencia mediana a medida que el músculo se fatiga. Este análisis resulta esencial en el campo de la ingeniería biomédica, ya que permite comprender el comportamiento fisiológico del músculo, desarrollar herramientas de diagnóstico no invasivas y mejorar el diseño de sistemas de monitoreo y rehabilitación muscular.
+
+# MARCO TEORICO 
+
+1. Electromiografía (EMG):
+La electromiografía es una técnica que permite registrar la actividad eléctrica producida por los músculos durante su contracción. Esta señal refleja el funcionamiento neuromuscular y es utilizada para estudiar la respuesta fisiológica del músculo ante distintos niveles de esfuerzo o fatiga.
+
+
+3. Tipos de EMG:
+Existen dos tipos principales de electromiografía: la EMG de superficie, que utiliza electrodos colocados sobre la piel y es un método no invasivo, y la EMG intramuscular, que emplea agujas insertadas directamente en el músculo para obtener señales más específicas.
+
+
+4. Configuración del registro:
+La señal EMG se obtiene mediante dos electrodos activos y un electrodo de referencia o tierra. La diferencia de potencial entre los electrodos activos representa la actividad muscular. La calidad del registro depende de la correcta ubicación, la distancia entre electrodos (w) y la profundidad de las fibras musculares (d).
+
+
+5. Adquisición de la señal:
+Para garantizar un registro adecuado, los electrodos deben colocarse sobre la piel limpia y seca, utilizando gel conductor para mejorar el contacto. Durante la adquisición, se deben controlar las condiciones de movimiento y evitar interferencias electromagnéticas que puedan alterar la señal.
+
+
+6. Procesamiento digital de la señal:
+El procesamiento digital es esencial para limpiar y analizar la señal EMG. Se aplican filtros pasa altas para eliminar el ruido de baja frecuencia y filtros pasa bajas para suprimir interferencias de alta frecuencia. Luego, se realiza un aventamiento, que consiste en dividir la señal en intervalos de tiempo utilizando ventanas como las de Hamming o Hanning.
+
+
+7. Análisis espectral (Transformada de Fourier – FFT):
+La Transformada Rápida de Fourier permite convertir la señal del dominio del tiempo al dominio de la frecuencia. Esto facilita el análisis del contenido espectral de la señal EMG y permite calcular la frecuencia mediana, un indicador útil para estudiar el comportamiento muscular.
+
+
+8. Fatiga muscular:
+La fatiga muscular se caracteriza por una disminución progresiva en la capacidad del músculo para mantener la contracción. En términos de la señal EMG, se observa como una reducción en la frecuencia mediana del espectro, lo que refleja una menor velocidad de conducción de las fibras musculares.
+
+
+9. Importancia en ingeniería biomédica:
+El análisis de señales EMG es fundamental en la ingeniería biomédica, ya que permite evaluar el rendimiento muscular, identificar signos de fatiga y desarrollar sistemas de rehabilitación y diagnóstico basados en el monitoreo de la actividad eléctrica muscular.
+
+# METODOLOGÍA 
+
+Instrumentación y prepación del sujeto de prueba 
+
+* Se selecciona como músculo de estudio el Gastrocnemio 
+
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 44_dd302a35](https://github.com/user-attachments/assets/b636bb70-461b-48c4-9d52-3cf43fdf248f)
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 45_50e3dbd0](https://github.com/user-attachments/assets/992fb53c-5d37-4a03-ab3b-fbc765bfa701)
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 45_284d877d](https://github.com/user-attachments/assets/787a878d-0a0e-4cfb-a549-9647ae0b7a59)
