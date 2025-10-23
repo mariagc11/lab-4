@@ -1,0 +1,125 @@
+import tkinter as tk
+from tkinter import messagebox
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from PyDAQmx import Task
+import PyDAQmx.DAQmxFunctions as daqf
+import PyDAQmx.DAQmxConstants as daqc
+from scipy.signal import butter, filtfilt
+from numpy import hamming
+from scipy.fft import fft
+from scipy.stats import ttest_ind
+import threading
+import time
+import csv
+
+# === Configuración del DAQ y archivo ===
+canal = "Dev9/ai0"
+fs = 1000               # Frecuencia de muestreo en Hz
+duracion = 3600         # Duración en segundos (1 hora)
+N = fs * duracion       # Total de muestras
+archivo = "emg_data.csv"
+
+# === Variables de control ===
+capturando = False
+data = []
+tiempo_total = []
+
+# === Clase para configurar el DAQ ===
+class DAQ(Task):
+    def __init__(self):
+        Task.__init__(self)
+        self.CreateAIVoltageChan(canal, "", daqc.DAQmx_Val_RSE, -5.0, 5.0, daqc.DAQmx_Val_Volts, None)
+        self.CfgSampClkTiming("", fs, daqc.DAQmx_Val_Rising, daqc.DAQmx_Val_ContSamps, N)
+
+    def read(self, muestras):
+        datos = np.zeros((muestras,), dtype=np.float64)
+        leidas = daqf.int32()
+        self.ReadAnalogF64(muestras, 10.0, daqc.DAQmx_Val_GroupByChannel, datos, muestras, daqf.byref(leidas), None)
+        return datos
+
+# === Función para capturar datos ===
+def capturar():
+    global capturando, data, tiempo_total
+    data = []
+    tiempo_total = []
+    daq = DAQ()
+    daq.StartTask()
+    por_bloque = 100
+    tiempo_actual = 0  # Inicia el tiempo en 0
+
+    while capturando and len(data) < N:
+        bloque = daq.read(por_bloque)
+        data.extend(bloque)
+
+        # Calcular los tiempos para el bloque actual
+        tiempos_bloque = np.linspace(tiempo_actual, tiempo_actual + (len(bloque)-1)/fs, len(bloque))
+        tiempo_total.extend(tiempos_bloque)
+        tiempo_actual = tiempo_total[-1] + 1/fs  # Avanzar el tiempo para el siguiente bloque
+
+        actualizar_grafica(data, tiempo_total)
+
+    daq.StopTask()
+    daq.ClearTask()
+
+# === Función para actualizar la gráfica en tiempo real ===
+def actualizar_grafica(datos, tiempos):
+    if not datos or not tiempos:
+        return
+    line.set_data(tiempos, datos)
+    ax.set_xlim(max(0, tiempos[-1] - 10), tiempos[-1] + 1)  # Mostrar últimos 10 segundos
+    ax.set_ylim(min(datos) - 0.1, max(datos) + 0.1)
+    canvas.draw()
+
+# === Función para guardar y analizar los datos capturados ===
+def guardar_y_analizar():
+    global data, tiempo_total
+    if not data:
+        messagebox.showwarning("Advertencia", "No hay datos capturados.")
+        return
+
+    with open(archivo, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(["Tiempo(s)", "EMG(V)"])
+        for i in range(len(data)):
+            writer.writerow([round(tiempo_total[i], 4), round(data[i], 6)])
+
+    messagebox.showinfo("Guardado", f"Datos guardados como {archivo}")
+
+# === Botones de control ===
+def iniciar():
+    global capturando
+    capturando = True
+    hilo = threading.Thread(target=capturar)
+    hilo.start()
+
+def detener():
+    global capturando
+    capturando = False
+
+# === Interfaz gráfica con Tkinter ===
+ventana = tk.Tk()
+ventana.title("Señal EMG - Captura y Análisis en Tiempo Real")
+ventana.geometry("800x600")
+
+fig, ax = plt.subplots(figsize=(7, 4))
+line, = ax.plot([], [])
+ax.set_title("Señal EMG en Tiempo Real")
+ax.set_xlabel("Tiempo (s)")
+ax.set_ylabel("Voltaje (V)")
+canvas = FigureCanvasTkAgg(fig, master=ventana)
+canvas.get_tk_widget().pack()
+
+# === Botones en la ventana ===
+frame_botones = tk.Frame(ventana)
+frame_botones.pack(pady=20)
+
+btn_iniciar = tk.Button(frame_botones, text="Iniciar Captura", command=iniciar)
+btn_iniciar.grid(row=0, column=0, padx=10)
+
+btn_detener = tk.Button(frame_botones, text="Detener y Guardar", command=lambda:[detener(), guardar_y_analizar()])
+btn_detener.grid(row=0, column=1, padx=10)
+
+ventana.mainloop()
+
