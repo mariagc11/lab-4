@@ -21,9 +21,10 @@ El script realiza los siguientes pasos:
 ---
 
 ## 🧩 Resultados y explicación de las figuras
-![Imagen de WhatsApp 2025-10-22 a las 19 22 26_d9533141](https://github.com/user-attachments/assets/5e9ba250-8c78-41b1-b3d6-be60b2337375)
+
 
 ### 1️⃣ EMG cruda vs filtrada
+![Imagen de WhatsApp 2025-10-22 a las 19 22 26_d9533141](https://github.com/user-attachments/assets/5e9ba250-8c78-41b1-b3d6-be60b2337375)
 En esta gráfica se compara la señal **EMG cruda** (azul) con la **EMG filtrada** (naranja) tras aplicar filtros pasa-altas y pasa-bajas de 20 a 450 Hz.  
 El filtrado elimina el componente DC y el ruido de baja frecuencia proveniente de movimiento o interferencia eléctrica, permitiendo conservar únicamente la actividad eléctrica muscular relevante.  
 Se observa una reducción notable en la amplitud y mayor limpieza en la señal filtrada, evidenciando que los filtros fueron aplicados correctamente y que la energía útil de la contracción muscular se mantiene dentro de la banda esperada.
