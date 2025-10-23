@@ -73,14 +73,16 @@ La frecuencia de muestreo fue de 100 Hz, garantizando una resolución temporal s
 
 La señal fue registrada de manera continua y en tiempo real, obteniéndo un archivo excel de la señal cruda, mostrando el comportamiento inicial y el posterior filtrado digital.
 
-# 🧠 Análisis de Señales Electromiográficas (EMG)
+A partir de la adquisión de la señal se procede a implementar un codgio en Python donde se realizan los correspondientes analisis. 
+
+# Análisis de Señales Electromiográficas (EMG)
 
 Este repositorio contiene el desarrollo y los resultados del análisis electromiográfico realizado a partir de un archivo CSV de señal EMG.  
 El código implementa **filtrado digital**, **ventaneo**, **análisis espectral**, **detección de fatiga** y **evaluación estadística** entre ventanas según los criterios del laboratorio.  
 
----
 
-## 📘 Descripción general del proceso
+
+# Descripción general del proceso
 
 El script realiza los siguientes pasos:
 1. **Lectura del archivo EMG (.csv)** y cálculo de la frecuencia de muestreo.
