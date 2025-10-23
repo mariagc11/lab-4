@@ -190,7 +190,6 @@ La ausencia de desplazamiento del espectro hacia frecuencias bajas indica que la
 ---
 ### 1️⃣1️⃣ FFT POR VENTANAS 
 <img width="1211" height="595" alt="image" src="https://github.com/user-attachments/assets/87d1068a-d198-4b41-9f00-e2cd56e0747c" />
-ChatGPT dijo:
 
 Figura 1 — “FFT por ventanas (subconjunto) – 0.5 s, 50% solape”
 El gráfico superpone decenas de espectros en dB de ventanas cortas (0.5 s) y muestra la variabilidad espectral del EMG a lo largo del tiempo. Se observa el ascenso rápido desde 0 Hz hasta la banda útil del EMG (~20–30 Hz) y luego un máximo amplio entre ~40–80 Hz, con curvas que difieren en nivel pero comparten la forma general. A partir de ~100 Hz la potencia decrece de manera progresiva, manteniéndose un “suelo” entre −20 y −50 dB según la ventana, y por encima de ~300–400 Hz la energía es baja, coherente con el filtrado pasa-banda y con la naturaleza de la señal muscular. En conjunto, el “abanico” de curvas ilustra cambios de activación/contracción entre ventanas, manteniendo la banda dominante en bajas–medias frecuencias.
@@ -198,7 +197,9 @@ El gráfico superpone decenas de espectros en dB de ventanas cortas (0.5 s) y mu
 ---
 ### 1️⃣2️⃣️ COMPARACION DE VENTANAS DE INICIO, MEDIO Y FINAL 
 <img width="1208" height="608" alt="image" src="https://github.com/user-attachments/assets/ff4a36cd-e758-4812-a2c3-35f75b75ee45" />
-Ahora con lo antes visto vemos la comparacion entre la ventana inicial, la del medio y la final con lo cual podemos concluir que por lo visto en la curva azul, se tiene que la señal tiene una potencia alta entre los 20 y 200 Hz que es la concentracion normal de frecuencia en la señal EMG tomada, ahora en la curva naranja vemos como se da parcialmente la baja de potencia que nos indica que el musculo se empesara a fatigar y por ultimo en la curva verde vemos la bajada de potencia drastica donde concluimos que el musculo se fatiga 
+
+Figura 2 — “FFT – ventanas: inicio vs medio vs final”
+Aquí se comparan tres espectros representativos: inicio (azul), mitad (naranja) y final (verde). Las ventanas de inicio y mitad muestran mayor potencia global y picos en la banda típica del EMG (~40–80 Hz), con energía apreciable hasta ~200–250 Hz. En contraste, la ventana final (verde) aparece deprimida en prácticamente todo el espectro (≈15–30 dB por debajo), lo que sugiere una disminución de la amplitud/actividad en esa fase del registro (por ejemplo, relajación o fatiga local). También se aprecian valles estrechos (notch/dips) puntuales, compatibles con variaciones de fase o cancelaciones en frecuencias concretas, pero la conclusión principal es la reducción espectral global hacia el final.
 
 ---
 ### 1️⃣3️⃣ Mapa espectral (ventanas de 0.5 s, 50 % de solape)
