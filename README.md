@@ -1,4 +1,9 @@
 # lab-4
+![Imagen de WhatsApp 2025-10-14 a las 16 56 44_dd302a35](https://github.com/user-attachments/assets/b636bb70-461b-48c4-9d52-3cf43fdf248f)
+![Imagen de WhatsApp 2025-10-14 a las 16 56 45_50e3dbd0](https://github.com/user-attachments/assets/992fb53c-5d37-4a03-ab3b-fbc765bfa701)
+![Imagen de WhatsApp 2025-10-14 a las 16 56 45_284d877d](https://github.com/user-attachments/assets/787a878d-0a0e-4cfb-a549-9647ae0b7a59)
+![Imagen de WhatsApp 2025-10-14 a las 16 56 47_7b7173d2](https://github.com/user-attachments/assets/2943a873-2744-4af5-b954-bbdb9cc2b8f0)
+
 <img width="785" height="632" alt="image" src="https://github.com/user-attachments/assets/178e3f6e-2bd5-4368-b1b3-a83dc24a19dd" />
 
 # 🧠 Análisis de Señales Electromiográficas (EMG)
