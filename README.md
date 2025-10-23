@@ -190,7 +190,11 @@ La ausencia de desplazamiento del espectro hacia frecuencias bajas indica que la
 ---
 ### 1️⃣1️⃣ FFT POR VENTANAS 
 <img width="1211" height="595" alt="image" src="https://github.com/user-attachments/assets/87d1068a-d198-4b41-9f00-e2cd56e0747c" />
-aca vemos com se aplico la FFT para cada ventana, por lo que cemos la divicion de cada una de estas viendo que su duracion es de 0.5s y superpuesta una en otra a la mitad para evitar la perdida de informaion, donde lo que nos intereza ver es el cambio de potencia para cada ventana, que nos indica que tan fuerte es la frecuencia en esa ventana, y viendo la forma de cada curva sin un aparente cambio podemos saber que la señal es estable ( sin fatiga o con fatiga  ) dependiendo de la potenca por ventana 
+ChatGPT dijo:
+
+Figura 1 — “FFT por ventanas (subconjunto) – 0.5 s, 50% solape”
+El gráfico superpone decenas de espectros en dB de ventanas cortas (0.5 s) y muestra la variabilidad espectral del EMG a lo largo del tiempo. Se observa el ascenso rápido desde 0 Hz hasta la banda útil del EMG (~20–30 Hz) y luego un máximo amplio entre ~40–80 Hz, con curvas que difieren en nivel pero comparten la forma general. A partir de ~100 Hz la potencia decrece de manera progresiva, manteniéndose un “suelo” entre −20 y −50 dB según la ventana, y por encima de ~300–400 Hz la energía es baja, coherente con el filtrado pasa-banda y con la naturaleza de la señal muscular. En conjunto, el “abanico” de curvas ilustra cambios de activación/contracción entre ventanas, manteniendo la banda dominante en bajas–medias frecuencias.
+
 ---
 ### 1️⃣2️⃣️ COMPARACION DE VENTANAS DE INICIO, MEDIO Y FINAL 
 <img width="1208" height="608" alt="image" src="https://github.com/user-attachments/assets/ff4a36cd-e758-4812-a2c3-35f75b75ee45" />
