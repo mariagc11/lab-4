@@ -90,6 +90,7 @@ Por lo tanto, el sistema detecta correctamente que **no hubo fatiga muscular** d
 Aquí se muestra la **señal completa segmentada en 366 ventanas cortas de 0.5 s con un 50 % de solape**.  
 Cada color representa una ventana distinta utilizada para el análisis estadístico y espectral de corto plazo.  
 Este ventaneo mejora la resolución temporal del análisis, permitiendo observar variaciones locales en la contracción muscular y preparar los datos para calcular parámetros como la media, desviación estándar y SNR en cada segmento.
+![Imagen de WhatsApp 2025-10-22 a las 19 24 57_529837a0](https://github.com/user-attachments/assets/e38af485-084a-4dcd-937f-7c42372baccf)
 
 ---
 
@@ -101,7 +102,7 @@ Los valores se mantienen estables, sin picos anómalos que indiquen variaciones 
 El FFR (frecuencia media ponderada) permanece dentro de rangos medios, reforzando la ausencia de cambios espectrales que sugieran fatiga.  
 Este análisis confirma que **la señal EMG es estable y fisiológicamente consistente** durante toda la medición.
 
----![Imagen de WhatsApp 2025-10-22 a las 19 24 57_529837a0](https://github.com/user-attachments/assets/e38af485-084a-4dcd-937f-7c42372baccf)
+---
 
 
 ### 🔟 Espectro promedio (ventanas de 0.5 s, 50 % de solape)
