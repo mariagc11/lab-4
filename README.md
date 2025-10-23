@@ -1,4 +1,6 @@
 # lab-4
+<img width="785" height="632" alt="image" src="https://github.com/user-attachments/assets/178e3f6e-2bd5-4368-b1b3-a83dc24a19dd" />
+
 # 🧠 Análisis de Señales Electromiográficas (EMG)
 
 Este repositorio contiene el desarrollo y los resultados del análisis electromiográfico realizado a partir de un archivo CSV de señal EMG.  
