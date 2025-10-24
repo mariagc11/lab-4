@@ -309,51 +309,51 @@ Se observa una reducción notable en la amplitud y mayor limpieza en la señal f
 ---
 
 ### 2️⃣ FFT global de la señal EMG filtrada
-![Imagen de WhatsApp 2025-10-22 a las 19 22 39_fc9ad6de](https://github.com/user-attachments/assets/47bd3d98-ec6b-432c-ba0f-5fff9c719305)
+<img width="1212" height="394" alt="image" src="https://github.com/user-attachments/assets/e6af6321-90f9-411d-a708-beff9c5d46d3" />
 
 Esta figura muestra el **análisis en frecuencia de toda la señal EMG** mediante la Transformada Rápida de Fourier (FFT).  
-Se observa un pico principal alrededor de los **60 Hz**, indicando que gran parte de la energía se concentra en ese rango, lo cual es característico de señales musculares activas.  
-Además, el espectro decae progresivamente hacia frecuencias altas, lo que confirma que el contenido útil se encuentra principalmente entre 20 y 150 Hz.
+Se observa un pico principal alrededor de los **10 Hz**, indicando que gran parte de la energía se concentra en ese rango, lo cual es característico de señales musculares activas.  
+Además, el espectro decae hacia frecuencias altas, lo que confirma que el contenido útil se encuentra principalmente entre 0 y 100 Hz.
 
 ---
 
 ### 3️⃣ Frecuencia mediana (*f_med*) por ventana de 30 s
-![Imagen de WhatsApp 2025-10-22 a las 19 22 56_c976c637](https://github.com/user-attachments/assets/80972cfb-318a-4328-80b2-96ecc580a821)
+<img width="1202" height="491" alt="image" src="https://github.com/user-attachments/assets/712def89-4aee-44f6-844d-9a8799674ec3" />
 
 Aquí se representa la evolución de la **frecuencia mediana** (*f_med*) a lo largo del tiempo, calculada en ventanas de 30 s sin solape.  
-Los valores se mantienen alrededor de **60 Hz**, con variaciones mínimas entre las cuatro ventanas analizadas.  
-La estabilidad de *f_med* sugiere una contracción muscular mantenida y sin signos de fatiga durante el registro.
+Los valores se mantienen alrededor de **40 a 140 Hz**, con variaciones entre las siete ventanas analizadas.  
+La estabilidad de *f_med* sugiere una contracción muscular mantenida y con signos de fatiga durante el registro.
 
 ---
 
 ### 4️⃣ Consola de resultados del ventaneo largo
-![Imagen de WhatsApp 2025-10-22 a las 19 23 05_27bfec1a](https://github.com/user-attachments/assets/d5edccef-9e70-4a2b-a89c-2f1619306fd9)
+<img width="1200" height="401" alt="image" src="https://github.com/user-attachments/assets/3d3301bb-5299-4e57-b3d2-3ee519e7b96b" />
 
 En este bloque se observan los datos generados por el programa para cada ventana de 30 s, indicando las posiciones de las muestras, el tiempo correspondiente y la *f_med* calculada.  
-Se registraron **cuatro ventanas**, todas con frecuencias medianas próximas a 60 Hz, lo cual respalda la consistencia espectral del músculo a lo largo del ensayo.
+Se registraron **siete ventanas**, todas con frecuencias medianas próximas entre los 70 y 110 Hz, lo cual respalda la consistencia espectral del músculo a lo largo del ensayo.
 
 ---
 
 ### 5️⃣ Mapa espectral por ventanas (30 s, Hamming)
-![Imagen de WhatsApp 2025-10-22 a las 19 23 23_4781633d](https://github.com/user-attachments/assets/513811cc-b859-43c0-8a51-7a1efb5fe5f1)
+<img width="1109" height="417" alt="image" src="https://github.com/user-attachments/assets/060c5bc3-e521-4682-911f-835b7603a9c0" />
 
 El mapa espectral representa la **distribución de potencia en función del tiempo y la frecuencia** para las ventanas largas.  
-Los colores cálidos (rojo y amarillo) muestran las zonas de mayor intensidad de señal, ubicadas entre 40 y 120 Hz, mientras que los tonos fríos (azul) representan menor potencia.  
-Se observa una densidad espectral estable a lo largo del tiempo, sin desplazamientos hacia frecuencias bajas, lo cual indica que la actividad muscular se mantuvo constante y **no hay evidencia de fatiga** durante el periodo analizado.
+Los colores cálidos (rojo y amarillo) muestran las zonas de mayor intensidad de señal, ubicadas entre 20 y 400 Hz, mientras que los tonos fríos (azul) representan menor potencia.  
+Se observa una densidad espectral estable a lo largo del tiempo, sin desplazamientos hacia frecuencias altas, lo cual indica que la actividad muscular se mantuvo constante y **se evidencia la fatiga en mayor parte al final de la señal** durante el periodo analizado.
 
 ---
 
 ### 6️⃣ Resultados numéricos de detección de fatiga
-![Imagen de WhatsApp 2025-10-22 a las 19 23 46_2bb50eae](https://github.com/user-attachments/assets/c7842ca3-1612-40d4-b0ed-50bd193a1331)
+<img width="1113" height="252" alt="image" src="https://github.com/user-attachments/assets/43932125-97cf-4a49-8a43-0aee4cdc4d3f" />
 
 Este recuadro presenta los resultados del **análisis estadístico de fatiga**.  
-La pendiente de la *f_med* (-0.0017 Hz/s) es prácticamente nula y no significativa (p = 0.875), con una caída porcentual del 0.33 %, muy por debajo del umbral del 5 %.  
-Esto significa que no se detecta una reducción relevante de la frecuencia mediana, por lo que el músculo **no presentó signos de fatiga electromiográfica** a lo largo del registro.
+La pendiente de la *f_med* (-0.04579 Hz/s) es prácticamente nula y no significativa (p = 0.2241), con una caída porcentual del 7.51 %, con un umbral de 5% 
+Esto significa que se detecta una reducción relevante de la frecuencia mediana, por lo que el músculo ** presentó signos de fatiga electromiográfica** a lo largo del registro.
 
 ---
 
 ### 7️⃣ Gráfica de *f_med* y decisión de fatiga
-![Imagen de WhatsApp 2025-10-22 a las 19 24 04_2ca1d8c5](https://github.com/user-attachments/assets/6d68c7d8-e783-459e-a307-c634210fb9ad)
+<img width="1206" height="382" alt="image" src="https://github.com/user-attachments/assets/10a38dff-d207-411e-a397-8547d169b30c" />
 
 En esta figura se visualiza la evolución de la *f_med* junto con la línea de tendencia (naranja discontinua) y las zonas de comparación entre el bloque inicial y final.  
 La tendencia casi horizontal y los valores similares al inicio y al final reafirman que **la potencia espectral del músculo se mantuvo estable**, sin desplazamiento hacia frecuencias más bajas.  
@@ -361,20 +361,21 @@ Por lo tanto, el sistema detecta correctamente que **no hubo fatiga muscular** d
 
 ---
 
-### 8️⃣ Señal segmentada en 366 ventanas de 0.5 s
+### 8️⃣ Señal segmentada en 728 ventanas de 0.5 s
 ![Imagen de WhatsApp 2025-10-22 a las 19 24 20_c2079646](https://github.com/user-attachments/assets/17990348-8aa0-4f82-a964-3093e3e390af)
 
-Aquí se muestra la **señal completa segmentada en 366 ventanas cortas de 0.5 s con un 50 % de solape**.  
+Aquí se muestra la **señal completa segmentada en 728 ventanas cortas de 0.5 s con un 50 % de solape**.  
 Cada color representa una ventana distinta utilizada para el análisis estadístico y espectral de corto plazo.  
 Este ventaneo mejora la resolución temporal del análisis, permitiendo observar variaciones locales en la contracción muscular y preparar los datos para calcular parámetros como la media, desviación estándar y SNR en cada segmento.
-![Imagen de WhatsApp 2025-10-22 a las 19 24 57_529837a0](https://github.com/user-attachments/assets/e38af485-084a-4dcd-937f-7c42372baccf)
+<img width="956" height="58" alt="image" src="https://github.com/user-attachments/assets/b1851277-0eb8-4dbe-8d4c-daee98523562" />
+
 
 ---
 
 ### 9️⃣ Parámetros calculados por ventana corta
-![Imagen de WhatsApp 2025-10-22 a las 19 24 41_f60d5ad7](https://github.com/user-attachments/assets/fc10110b-b2f6-46b2-8fbc-cc354fbe59ea)
+<img width="1202" height="589" alt="image" src="https://github.com/user-attachments/assets/7379221d-d295-44a5-a771-5712a6849a9d" />
 
-Esta figura muestra la evolución de varios **parámetros estadísticos** (media, desviación estándar, coeficiente de variación, SNR y FFR) calculados en cada una de las 366 ventanas.  
+Esta figura muestra la evolución de varios **parámetros estadísticos** (media, desviación estándar, coeficiente de variación, SNR y FFR) calculados en cada una de las 728 ventanas.  
 Los valores se mantienen estables, sin picos anómalos que indiquen variaciones abruptas en la señal.  
 El FFR (frecuencia media ponderada) permanece dentro de rangos medios, reforzando la ausencia de cambios espectrales que sugieran fatiga.  
 Este análisis confirma que **la señal EMG es estable y fisiológicamente consistente** durante toda la medición.
@@ -383,30 +384,28 @@ Este análisis confirma que **la señal EMG es estable y fisiológicamente consi
 
 
 ### 🔟 Espectro promedio (ventanas de 0.5 s, 50 % de solape)
-![Imagen de WhatsApp 2025-10-22 a las 19 25 15_50c85ee7](https://github.com/user-attachments/assets/68cf1390-7c74-45d8-9e27-2ad0d6464c95)
+<img width="1209" height="476" alt="image" src="https://github.com/user-attachments/assets/80823182-7bc8-40d6-8100-a2e58dabc366" />
 
 Esta figura representa el **espectro promedio** obtenido a partir de todas las ventanas cortas de 0.5 s con 50 % de solape.  
-La curva muestra cómo se distribuye la potencia de la señal EMG en el dominio de la frecuencia, expresada en decibelios (dB).  
-Se observan picos notables entre **50 Hz y 120 Hz**, correspondientes a la actividad muscular voluntaria, y una disminución progresiva hacia frecuencias más altas, lo cual es característico de un músculo activo pero sin fatiga.  
-La ausencia de desplazamiento del espectro hacia frecuencias bajas indica que la energía de la señal se mantiene estable y que el músculo conserva su capacidad de contracción sin deterioro en la respuesta eléctrica.
-
+La curva muestra cómo se distribuye la potencia de la señal EMG en el dominio de la frecuencia, expresada en decibelios (dB). 
+Se nota una alza de potencia entre los **20 y los 450 Hz **correspondientes a la actividad muscular voluntaria, y una disminucion a frecuencias altas donde se evidencia el comiezo de la fatiga.  
 ---
 ### 1️⃣1️⃣ FFT POR VENTANAS 
-<img width="1211" height="595" alt="image" src="https://github.com/user-attachments/assets/87d1068a-d198-4b41-9f00-e2cd56e0747c" />
+<img width="1197" height="598" alt="image" src="https://github.com/user-attachments/assets/05da7556-5b54-41df-bc7f-c4360717da99" />
 
 Figura 1 — “FFT por ventanas (subconjunto) – 0.5 s, 50% solape”
 El gráfico superpone decenas de espectros en dB de ventanas cortas (0.5 s) y muestra la variabilidad espectral del EMG a lo largo del tiempo. Se observa el ascenso rápido desde 0 Hz hasta la banda útil del EMG (~20–30 Hz) y luego un máximo amplio entre ~40–80 Hz, con curvas que difieren en nivel pero comparten la forma general. A partir de ~100 Hz la potencia decrece de manera progresiva, manteniéndose un “suelo” entre −20 y −50 dB según la ventana, y por encima de ~300–400 Hz la energía es baja, coherente con el filtrado pasa-banda y con la naturaleza de la señal muscular. En conjunto, el “abanico” de curvas ilustra cambios de activación/contracción entre ventanas, manteniendo la banda dominante en bajas–medias frecuencias.
 
 ---
 ### 1️⃣2️⃣️ COMPARACION DE VENTANAS DE INICIO, MEDIO Y FINAL 
-<img width="1208" height="608" alt="image" src="https://github.com/user-attachments/assets/ff4a36cd-e758-4812-a2c3-35f75b75ee45" />
+<img width="1204" height="584" alt="image" src="https://github.com/user-attachments/assets/2dd21dea-23c5-44d5-aeac-62607ae39da6" />
 
 Figura 2 — “FFT – ventanas: inicio vs medio vs final”
 Aquí se comparan tres espectros representativos: inicio (azul), mitad (naranja) y final (verde). Las ventanas de inicio y mitad muestran mayor potencia global y picos en la banda típica del EMG (~40–80 Hz), con energía apreciable hasta ~200–250 Hz. En contraste, la ventana final (verde) aparece deprimida en prácticamente todo el espectro (≈15–30 dB por debajo), lo que sugiere una disminución de la amplitud/actividad en esa fase del registro (por ejemplo, relajación o fatiga local). También se aprecian valles estrechos (notch/dips) puntuales, compatibles con variaciones de fase o cancelaciones en frecuencias concretas, pero la conclusión principal es la reducción espectral global hacia el final.
 
 ---
 ### 1️⃣3️⃣ Mapa espectral (ventanas de 0.5 s, 50 % de solape)
-![Imagen de WhatsApp 2025-10-22 a las 19 45 23_6c335f8a](https://github.com/user-attachments/assets/436f2faa-2327-49e1-bd40-7bee27d80661)
+<img width="1124" height="413" alt="image" src="https://github.com/user-attachments/assets/91ca29e5-c3e6-40bb-8df6-14a7218a3f3e" />
 
 El mapa espectral de alta resolución muestra la **variación temporal de la potencia en función de la frecuencia** para las 366 ventanas cortas generadas.  
 Los tonos cálidos (rojo y amarillo) indican regiones de mayor potencia, concentradas principalmente entre **40 y 120 Hz**, mientras que los tonos fríos (verde y azul) representan zonas de menor actividad eléctrica.  
