@@ -73,6 +73,39 @@ AL proceso se le realiza una toma fotografica para visualizar los pasos anterior
 
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 47_7b7173d2](https://github.com/user-attachments/assets/2943a873-2744-4af5-b954-bbdb9cc2b8f0)
 
+# EXPLICACION DE CODIGO 
+Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
+# Definicion de filtro Butterworth
+
+se definen las frecuencias de corte del filtro establecidas entre 20 y 450 Hz, tambien se define la frecuencia de muestreo para la señal y la frecuencia  Nyquist obtenida de la mitad de la frecuencia de muestreo.
+# Aplicacion del filtro 
+
+Llama el filtro definido antes y lo aplica a la señal EMG optenida en su data cruda, aplicando la ecuacion del filtro punto por punto 
+
+# Transformada Rapida de fourier FFT
+
+en esta funcion se muestra el espectro de frecuencias en cada ventana de la señal, obteniendo asi la potencia en cada una de las ventanas mediante un vector de frecuencias 
+
+# Ventaneo 
+
+En esta parte se da la separacion de la señal depfinida en un tiempo de 0.5 s y un solapamiento del 50% lo cual superpone cada ventana a la mitad para evitar la perdida de datos, de esta pmanera se puede analizas la potencia uniforme de la señal en cada momento 
+
+# Implementacion de las medidas estadisticas 
+
+Con esta parte se sacan las medidas de media, desviacion estandar y coeficiente de variacion para la señal EMG donde vemos la activacion muscular y su variacion, tomando que cuando la media baja y el coeficiente de variacion aumenta se toma por fatiga muscular.
+
+# Deteccion de fatiga
+
+Aca tomamos el caculo de la frecuencia media vista anteriormente y como savemso se presenta la orden de fatiga al momento en el que la media baja sabiendo que la energia se desplaza hacia frecuencias bajas 
+
+# Graficas 
+
+se procede a graficar los diferentes analisis, como el de comparacion de ventanas par asi distinguir los momentos de la señal EMG
+
+# Exportacion de resultados 
+
+por ultímo se exportan los resultados a una carpeta propia donde se guardan en exel los datos de la señal y calculos estadisticos y en png las graficas
+
 # ADQUISICIÓN DE LA SEÑAL 
 Para la adquisicón de la señal se realiza una interfaz de adquisión directamente en Python implementando el codigo correspondiente. En la siguiente imagen se muestra la interfaz: 
 
