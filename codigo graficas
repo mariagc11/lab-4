@@ -120,6 +120,23 @@ def main():
         raise ValueError("HP_CORTE debe ser > 0 Hz.")
     if HP_CORTE >= LP_CORTE:
         raise ValueError("HP_CORTE debe ser menor que LP_CORTE.")
+    
+    N_total = len(emg)
+    freqs_global = fftfreq(N_total, 1/fs)[:N_total//2]
+    fft_global   = np.abs(fft(emg))[:N_total//2]
+
+    plt.figure(figsize=(12,4))
+    plt.plot(freqs_global, fft_global)
+    plt.title("FFT global - EMG filtrada")
+    plt.xlabel("Frecuencia (Hz)"); plt.ylabel("Magnitud")
+    plt.grid(True); plt.tight_layout()
+    if GUARDAR_PNG:
+        plt.savefig(os.path.join(OUTDIR, "02_fft_global.png"), dpi=200)
+    plt.show()
+
+    guardar_excel(os.path.join(OUTDIR, "emg_fft_global.xlsx"),
+                  [freqs_global, fft_global],
+                  ["f (Hz)", "Magnitud"])
 
     # 2) FILTRADO (HP + LP)
     emg = emg - np.nanmean(emg)  # quitar DC
@@ -158,13 +175,12 @@ def main():
                   [freqs_global, fft_global],
                   ["f (Hz)", "Magnitud"])
 
-    # 4) VENTANAS LARGAS POR ÍNDICES (en MUESTRAS) + f_med + mapa espectral
+    # 4) VENTANAS LARGAS + f_med + MAPA ESPECTRAL
     N_win = int(round(WIN_SEC * fs))
     step  = int(round(N_win * (1.0 - OVERLAP)))
     if step <= 0:
         raise ValueError("Revisa OVERLAP: el 'step' debe ser > 0.")
 
-    # Mensaje explícito de configuración de ventaneo (añadido)
     print(f"Ventaneo largo: WIN_SEC={WIN_SEC:.1f}s | OVERLAP={OVERLAP:.2f} | ventana='{VENTANA_TIPO}'")
     print("Nota: el ventaneo corto (0.5 s, 50% solape) usa Hamming por defecto.")
 
@@ -271,48 +287,35 @@ def main():
     guardar_excel(os.path.join(OUTDIR, "emg_espectro_promedio_largo.xlsx"),
                   [frecuencias_fft, P_mean_largo], ["f (Hz)", "Potencia promedio (u.a.)"])
 
-    # === (NUEVO) Significancia espectral por bandas entre ventanas (inicio vs final) ===
-    # Define bandas (ajústalas si tu profe pide otras)
-    bandas = [
-        (20, 60),
-        (60, 120),
-        (120, 250)
-    ]
-
+    # === Significancia por bandas (inicio vs final) ===
+    bandas = [(20, 60), (60, 120), (120, 250)]
     V = espectros_por_ventana.shape[0]
-    if V >= 4:  # suficiente para dividir en bloques
+    if V >= 4:
         n_ini = max(1, int(np.floor(V * FRAC_INICIO)))
         n_fin = max(1, int(np.floor(V * FRAC_FINAL)))
         idx_ini = np.arange(0, n_ini)
         idx_fin = np.arange(V - n_fin, V)
 
-        resultados = []  # filas: [blo, bhi, ini_mean, fin_mean, cambio_pct, p_raw]
+        resultados = []
         print("\n=== Significancia espectral por bandas (Welch, inicio vs final) ===")
         for (blo, bhi) in bandas:
             mask = (frecuencias_fft >= blo) & (frecuencias_fft <= bhi)
             if not np.any(mask):
-                print(f"Banda {blo:.0f}-{bhi:.0f} Hz: sin bins en el espectro -> se omite")
+                print(f"Banda {blo:.0f}-{bhi:.0f} Hz: sin bins -> se omite")
                 continue
-
-            # Potencia integrada por banda, por ventana
             pot_por_vent = np.sum(espectros_por_ventana[:, mask], axis=1)
             ini_vals = pot_por_vent[idx_ini]
             fin_vals = pot_por_vent[idx_fin]
-
             ini_mean = np.nanmean(ini_vals)
             fin_mean = np.nanmean(fin_vals)
             cambio_pct = 100.0 * (fin_mean - ini_mean) / ini_mean if ini_mean != 0 else np.nan
-
             t_stat, p_val = stats.ttest_ind(ini_vals, fin_vals, equal_var=False, nan_policy='omit')
             resultados.append([blo, bhi, ini_mean, fin_mean, cambio_pct, p_val])
+            print(f"Banda {blo:.0f}-{bhi:.0f} Hz | Ini={ini_mean:.3g}  Fin={fin_mean:.3g}  Δ%={cambio_pct:.1f}%  p={p_val:.4g}")
 
-            print(f"Banda {blo:.0f}-{bhi:.0f} Hz | "
-                  f"Ini={ini_mean:.3g}  Fin={fin_mean:.3g}  Δ%={cambio_pct:.1f}%  p={p_val:.4g}")
-
-        # Corrección Bonferroni
         if resultados:
             m = len(resultados)
-            print(f"\nCorrección Bonferroni para m={m} bandas, ALPHA={ALPHA}")
+            print(f"\nCorrección Bonferroni (m={m}, ALPHA={ALPHA})")
             resultados_corr = []
             for (blo, bhi, ini_mean, fin_mean, cambio_pct, p_val) in resultados:
                 p_bonf = min(p_val * m, 1.0)
@@ -320,45 +323,20 @@ def main():
                 resultados_corr.append([blo, bhi, ini_mean, fin_mean, cambio_pct, p_val, p_bonf, "Sí" if sig else "No"])
                 print(f"Banda {blo:.0f}-{bhi:.0f} Hz -> p_raw={p_val:.4g}, p_bonf={p_bonf:.4g}  "
                       f"{'**Significativo**' if sig else '(no significativo)'}")
-
-            # Guardar Excel con resultados
             guardar_excel(os.path.join(OUTDIR, "emg_significancia_bandas.xlsx"),
                           list(map(list, zip(*resultados_corr))),
                           ["f_low (Hz)", "f_high (Hz)", "P_ini", "P_fin", "Δ% fin-ini", "p_raw", "p_bonf", "Signif"])
-
-            # Gráfica: cambio porcentual por banda con marca de significancia
-            try:
-                etiquetas = [f"{int(r[0])}-{int(r[1])}" for r in resultados_corr]
-                cambios = [r[4] for r in resultados_corr]
-                signif = [r[7] == "Sí" for r in resultados_corr]
-
-                plt.figure(figsize=(8,4))
-                plt.bar(range(len(cambios)), cambios)
-                for i, es_sig in enumerate(signif):
-                    if es_sig:
-                        plt.text(i, cambios[i], "*", ha="center", va="bottom", fontsize=14)
-                plt.xticks(range(len(cambios)), etiquetas)
-                plt.axhline(0, lw=1, ls="--")
-                plt.ylabel("Cambio porcentual de potencia (Fin vs Ini)")
-                plt.title("Cambio por banda (Bonferroni: * = significativo)")
-                plt.tight_layout()
-                if GUARDAR_PNG:
-                    plt.savefig(os.path.join(OUTDIR, "09_significancia_bandas.png"), dpi=200)
-                plt.show()
-            except Exception as e:
-                print("No se pudo dibujar la figura de significancia por bandas:", e)
     else:
-        print("\n[Significancia por bandas] Muy pocas ventanas para comparar inicio vs final; se omite.")
+        print("\n[Significancia por bandas] Muy pocas ventanas; se omite.")
 
-    # 5) DETECCIÓN DE FATIGA (con f_med de ventanas largas)
+    # 5) DETECCIÓN DE FATIGA (f_med de ventanas largas)
     mask_valid = np.isfinite(f_med_lista) & np.isfinite(centros_t)
     if np.count_nonzero(mask_valid) < 3:
         print("No hay suficientes ventanas válidas para evaluar fatiga.")
     else:
         t_val = centros_t[mask_valid]
         f_val = f_med_lista[mask_valid]
-
-        lr = stats.linregress(t_val, f_val)  # tendencia
+        lr = stats.linregress(t_val, f_val)
         pendiente_hz_s = lr.slope
         p_slope = lr.pvalue
 
@@ -391,7 +369,6 @@ def main():
             print(f"Welch inicio vs final: t={t_stat:.3f}, p={p_ttest:.4g}")
         print(f">>> FATIGA MUSCULAR: {'SÍ' if hay_fatiga else 'NO'}")
 
-        # Gráfico con tendencia
         plt.figure(figsize=(12,4))
         plt.plot(t_val, f_val, marker='o', label='f_med por ventana')
         plt.plot(t_val, lr.intercept + lr.slope*t_val, ls='--', label=f"Tendencia (p={p_slope:.3g})")
@@ -411,7 +388,7 @@ def main():
         plt.show()
 
     # =========================================================
-    # 6) VENTANAS CORTAS: 0.5 s con 50% de solape (estadísticos, SNR y FFR)
+    # 6) VENTANAS CORTAS: 0.5 s con 50% de solape (SNR + FFT por ventana)
     # =========================================================
     duracion_ventana = 0.5    # segundos
     solape = 0.5              # 50%
@@ -421,35 +398,44 @@ def main():
         paso = 1
     num_muestras = len(emg_bp)
 
-    if muestras_ventana >= 4 and num_muestras >= muestras_ventana:
+    # inicializamos para evitar NameError si se salta el bloque
+    potencias_cortas = np.array([])
+    f_axis_corto = np.array([])
+
+    if muestras_ventana >=0 and num_muestras >= muestras_ventana:
         indices_inicio = np.arange(0, num_muestras - muestras_ventana + 1, paso)
         num_ventanas = len(indices_inicio)
         print(f"\n[Ventanas 0.5s/50%] Total de ventanas generadas: {num_ventanas}")
 
-        # --- acumuladores ---
-        medias, desv_std, coef_var = [], [], []
+               # acumuladores
+        medias, medianas, desv_std, coef_var = [], [], [], []
         snr_list, ffr_list, potencias_cortas = [], [], []
         tiempos_centros_corto = []
 
-        for i, inicio in enumerate(indices_inicio):
+        for inicio in indices_inicio:
             fin = inicio + muestras_ventana
             ventana_sig = emg_bp[inicio:fin]
             t_ventana = tiempo[inicio:fin]
             tiempos_centros_corto.append(np.mean(t_ventana))
 
-            # Estadísticos básicos
+            # === MÉTRICAS ESTADÍSTICAS ===
             mean_val = np.mean(ventana_sig)
-            std_val  = np.std(ventana_sig)
+            median_val = np.median(ventana_sig)
+            std_val  = np.std(ventana_sig, ddof=0)
             cv_val   = (std_val / mean_val) * 100 if mean_val != 0 else np.nan
-            medias.append(mean_val); desv_std.append(std_val); coef_var.append(cv_val)
 
-            # SNR simple
+            medias.append(mean_val)
+            medianas.append(median_val)
+            desv_std.append(std_val)
+            coef_var.append(cv_val)
+
+            # === SNR ===
             potencia_signal = np.mean(ventana_sig ** 2)
-            potencia_ruido  = np.var(ventana_sig - mean_val)
+            potencia_ruido  = np.var(ventana_sig - mean_val, ddof=0)
             snr_val = 10 * np.log10(potencia_signal / potencia_ruido) if potencia_ruido > 0 else np.nan
             snr_list.append(snr_val)
 
-            # Espectro y FFR (frecuencia media ponderada por potencia)
+            # === FFT y FFR ===
             ham = np.hamming(len(ventana_sig))
             Y = rfft(ventana_sig * ham)
             f = rfftfreq(len(ventana_sig), 1/fs)
@@ -458,85 +444,256 @@ def main():
             ffr = np.sum(f * P) / np.sum(P) if np.sum(P) > 0 else np.nan
             ffr_list.append(ffr)
 
-        # Convertir a arrays
-        medias = np.array(medias); desv_std = np.array(desv_std)
-        coef_var = np.array(coef_var); snr_list = np.array(snr_list)
-        ffr_list = np.array(ffr_list); tiempos_centros_corto = np.array(tiempos_centros_corto)
         potencias_cortas = np.array(potencias_cortas, dtype=float)
+        f_axis_corto = rfftfreq(muestras_ventana, 1/fs)
+        tiempos_centros_corto = np.array(tiempos_centros_corto)
 
-        # Guardar Excel con métricas por ventana corta
+        # === EXPORTAR A EXCEL (ahora con MEDIANA) ===
+        guardar_excel(os.path.join(OUTDIR, "emg_ventanas_0p5s_metricas.xlsx"),
+                      [tiempos_centros_corto, medias, medianas, desv_std, coef_var, snr_list, ffr_list],
+                      ["t_centro (s)", "Media", "Mediana", "DesvEst", "CoefVar (%)", "SNR (dB)", "FFR (Hz)"])
+
+        # === GRÁFICA DE TODAS LAS MÉTRICAS ===
+        plt.figure(figsize=(14, 12))
+
+        plt.subplot(6, 1, 1)
+        plt.plot(tiempos_centros_corto, medias, 'o-', color='b')
+        plt.title("Media por ventana (0.5 s, 50% solape)")
+        plt.ylabel("Media (V)")
+        plt.grid(True)
+
+        plt.subplot(6, 1, 2)
+        plt.plot(tiempos_centros_corto, medianas, 'o-', color='purple')
+        plt.title("Mediana por ventana (0.5 s, 50% solape)")
+        plt.ylabel("Mediana (V)")
+        plt.grid(True)
+
+        plt.subplot(6, 1, 3)
+        plt.plot(tiempos_centros_corto, desv_std, 'o-', color='r')
+        plt.title("Desviación estándar por ventana")
+        plt.ylabel("DesvEst (V)")
+        plt.grid(True)
+
+        plt.subplot(6, 1, 4)
+        plt.plot(tiempos_centros_corto, coef_var, 'o-', color='m')
+        plt.title("Coeficiente de variación por ventana")
+        plt.ylabel("CV (%)")
+        plt.grid(True)
+
+        plt.subplot(6, 1, 5)
+        plt.plot(tiempos_centros_corto, snr_list, 'o-', color='g')
+        plt.title("Relación señal-ruido (SNR) por ventana")
+        plt.ylabel("SNR (dB)")
+        plt.grid(True)
+
+        plt.subplot(6, 1, 6)
+        plt.plot(tiempos_centros_corto, ffr_list, 'o-', color='orange')
+        plt.title("Frecuencia media (FFR) por ventana")
+        plt.ylabel("FFR (Hz)")
+        plt.xlabel("Tiempo (s)")
+        plt.grid(True)
+
+        plt.tight_layout()
+        if GUARDAR_PNG:
+            plt.savefig(os.path.join(OUTDIR, "07_metricas_completas_por_ventana_corta.png"), dpi=200)
+        plt.show()
+
+        plt.tight_layout()
+        if GUARDAR_PNG:
+            plt.savefig(os.path.join(OUTDIR, "07a_metricas_por_ventana_corta.png"), dpi=200)
+        plt.show()
+
+
+        # Excel de métricas (incluye SNR)
         guardar_excel(os.path.join(OUTDIR, "emg_ventanas_0p5s_metricas.xlsx"),
                       [tiempos_centros_corto, medias, desv_std, coef_var, snr_list, ffr_list],
                       ["t_centro (s)", "Media", "DesvEst", "CoefVar (%)", "SNR (dB)", "FFR (Hz)"])
 
-        # 7) Gráfica: toda la señal segmentada en ventanas cortas
-        plt.figure(figsize=(16,6))
-        for inicio in indices_inicio:
-            fin = inicio + muestras_ventana
-            plt.plot(tiempo[inicio:fin], emg_bp[inicio:fin])
-        plt.title(f"Toda la señal en {num_ventanas} ventanas de 0.5 s con 50% de solape")
-        plt.xlabel("Tiempo (s)"); plt.ylabel("Amplitud")
+        # SNR por ventana
+        plt.figure(figsize=(12,4))
+        plt.plot(tiempos_centros_corto, snr_list, 'o-')
+        plt.title("SNR por ventana corta (0.5 s, 50% solape)")
+        plt.xlabel("Tiempo (s)"); plt.ylabel("SNR (dB)")
         plt.grid(True); plt.tight_layout()
         if GUARDAR_PNG:
-            plt.savefig(os.path.join(OUTDIR, "06_ventanas_0p5s_senal.png"), dpi=200)
+            plt.savefig(os.path.join(OUTDIR, "07b_snr_0p5s.png"), dpi=200)
         plt.show()
 
-        # 8) Gráficas de parámetros por ventana corta
-        fig, axs = plt.subplots(5, 1, figsize=(12, 12), sharex=True)
-        axs[0].plot(tiempos_centros_corto, medias, 'o-');     axs[0].set_ylabel("Media");               axs[0].grid(True)
-        axs[1].plot(tiempos_centros_corto, desv_std, 'o-');   axs[1].set_ylabel("Desv. estándar");      axs[1].grid(True)
-        axs[2].plot(tiempos_centros_corto, coef_var, 'o-');   axs[2].set_ylabel("Coef. variación (%)"); axs[2].grid(True)
-        axs[3].plot(tiempos_centros_corto, snr_list, 'o-');   axs[3].set_ylabel("SNR (dB)");            axs[3].grid(True)
-        axs[4].plot(tiempos_centros_corto, ffr_list, 'o-');   axs[4].set_ylabel("FFR (Hz)");            axs[4].grid(True)
-        axs[4].set_xlabel("Tiempo (s)")
-        plt.suptitle("Parámetros por ventana (0.5 s, solape 50%)")
-        plt.tight_layout(rect=[0, 0, 1, 0.96])
+        # Espectro promedio (corto)
+        P_mean_short = np.mean(potencias_cortas, axis=0)
+        plt.figure(figsize=(10,4))
+        plt.plot(f_axis_corto, 10*np.log10(P_mean_short + 1e-12))
+        plt.title("Espectro promedio (ventanas 0.5 s, 50% solape)")
+        plt.xlabel("Frecuencia (Hz)"); plt.ylabel("Potencia (dB)")
+        plt.grid(True); plt.tight_layout()
         if GUARDAR_PNG:
-            plt.savefig(os.path.join(OUTDIR, "07_metricas_0p5s.png"), dpi=200)
+            plt.savefig(os.path.join(OUTDIR, "08_espectro_promedio_0p5s.png"), dpi=200)
         plt.show()
+        guardar_excel(os.path.join(OUTDIR, "emg_espectro_promedio_0p5s.xlsx"),
+                      [f_axis_corto, P_mean_short], ["f (Hz)", "Potencia promedio (u.a.)"])
 
-        # 9) Espectro promedio (ventanas cortas)
-        f_axis_corto = rfftfreq(muestras_ventana, 1/fs)
-        P_mean_short = np.mean(potencias_cortas, axis=0) if potencias_cortas.size else np.array([])
-        if P_mean_short.size:
-            plt.figure(figsize=(10,4))
-            plt.plot(f_axis_corto, 10*np.log10(P_mean_short + 1e-12))
-            plt.title("Espectro promedio (ventanas 0.5 s, 50% solape)")
+        # === FFT por ventana corta (exportación completa + overlays) ===
+        if potencias_cortas.size and f_axis_corto.size:
+            columnas_fft = [f_axis_corto]
+            headers_fft = ["f (Hz)"]
+            for i in range(num_ventanas):
+                columnas_fft.append(potencias_cortas[i, :])
+                headers_fft.append(f"P_win_{i+1:04d} (u.a.)")
+            guardar_excel(os.path.join(OUTDIR, "emg_fft_ventanas_0p5s.xlsx"),
+                          columnas_fft, headers_fft)
+
+            # Overlay de FFTs (subconjunto)
+            max_curvas = 30
+            step = max(1, num_ventanas // max_curvas)
+            idx_overlay = np.arange(0, num_ventanas, step)
+            plt.figure(figsize=(12, 6))
+            for i in idx_overlay:
+                P_db = 10 * np.log10(potencias_cortas[i, :] + 1e-12)
+                plt.plot(f_axis_corto, P_db, lw=0.8, alpha=0.6,
+                         label=f"win {i+1:03d} (t≈{tiempos_centros_corto[i]:.1f}s)")
+            plt.title("FFT por ventanas (subconjunto) – 0.5 s, 50% solape")
             plt.xlabel("Frecuencia (Hz)"); plt.ylabel("Potencia (dB)")
-            plt.grid(True); plt.tight_layout()
+            plt.grid(True); plt.xlim([0, 400])
+            if len(idx_overlay) <= 12:
+                plt.legend(ncol=2, fontsize=8)
+            plt.tight_layout()
             if GUARDAR_PNG:
-                plt.savefig(os.path.join(OUTDIR, "08_espectro_promedio_0p5s.png"), dpi=200)
+                plt.savefig(os.path.join(OUTDIR, "08b_fft_ventanas_overlay.png"), dpi=200)
             plt.show()
 
-            # Exportar espectro promedio corto
-            guardar_excel(os.path.join(OUTDIR, "emg_espectro_promedio_0p5s.xlsx"),
-                          [f_axis_corto, P_mean_short], ["f (Hz)", "Potencia promedio (u.a.)"])
-    else:
-        print("\n[Ventanas 0.5s/50%] Señal muy corta o ventana inválida; se omite esta sección.")
+            # Inicio vs mitad vs final
+            sel = [0, num_ventanas // 2, num_ventanas - 1] if num_ventanas >= 3 else list(range(num_ventanas))
+            plt.figure(figsize=(10, 5))
+            for i in sel:
+                P_db = 10 * np.log10(potencias_cortas[i, :] + 1e-12)
+                plt.plot(f_axis_corto, P_db, lw=1.2,
+                         label=f"win {i+1:03d} (t≈{tiempos_centros_corto[i]:.1f}s)")
+            plt.title("FFT – ventanas: inicio vs medio vs final")
+            plt.xlabel("Frecuencia (Hz)"); plt.ylabel("Potencia (dB)")
+            plt.grid(True); plt.xlim([0, 400]); plt.legend(); plt.tight_layout()
+            if GUARDAR_PNG:
+                plt.savefig(os.path.join(OUTDIR, "08c_fft_inicio_mitad_final.png"), dpi=200)
+            plt.show()
 
-    print("\nListo: análisis completo. Archivos guardados en:", Path(OUTDIR).resolve())
-        # === Mapa espectral de ventanas cortas (0.5 s, 50% solape) ===
-    if potencias_cortas.size:
-            # potencias_cortas: shape (num_ventanas, num_freqs)
-            # f_axis_corto: eje de frecuencias (num_freqs,)
-            # tiempos_centros_corto: tiempos centro de cada ventanita (num_ventanas,)
-
+            # Mapa espectral corto
             plt.figure(figsize=(14, 5))
-            extent = [tiempos_centros_corto[0], tiempos_centros_corto[-1],
-                      f_axis_corto[0], f_axis_corto[-1]]
+            extent = [tiempos_centros_corto[0], tiempos_centros_corto[-1], f_axis_corto[0], f_axis_corto[-1]]
             plt.imshow(10*np.log10(potencias_cortas.T + 1e-12),
                        aspect='auto', origin='lower', extent=extent, cmap='jet')
             plt.colorbar(label='Potencia (dB)')
             plt.title("Mapa espectral (ventanas 0.5 s, 50% solape)")
-            plt.ylabel("Frecuencia (Hz)")
-            plt.xlabel("Tiempo (s) (centro de ventana)")
-
-            # Acota a banda EMG típica si quieres
-            plt.ylim([0, 400])
-            plt.tight_layout()
+            plt.ylabel("Frecuencia (Hz)"); plt.xlabel("Tiempo (s) (centro de ventana)")
+            plt.ylim([0, 400]); plt.tight_layout()
             if GUARDAR_PNG:
                 plt.savefig(os.path.join(OUTDIR, "10_mapa_espectral_0p5s.png"), dpi=200)
             plt.show()
+                # =========================================================
+    # 7) DETECCIÓN DE FATIGA USANDO LAS 728 VENTANAS CORTAS
+    # =========================================================
+    print("\n=== DETECCIÓN DE FATIGA (usando ventanas cortas de 0.5 s) ===")
+
+    if potencias_cortas.size and f_axis_corto.size:
+        # --- Calcular frecuencia mediana por ventana corta ---
+        f_lo, f_hi = BANDA_FATIGA
+        f_med_cortas = []
+
+        for i in range(potencias_cortas.shape[0]):
+            P = potencias_cortas[i, :]
+            freqs = f_axis_corto
+            mask = (freqs >= f_lo) & (freqs <= f_hi)
+            if np.sum(P[mask]) > 0:
+                cs = np.cumsum(P[mask])
+                mitad = 0.5 * cs[-1]
+                idx = np.searchsorted(cs, mitad)
+                f_med = freqs[mask][min(idx, np.sum(mask)-1)]
+            else:
+                f_med = np.nan
+            f_med_cortas.append(f_med)
+
+        f_med_cortas = np.array(f_med_cortas, dtype=float)
+
+        # --- Guardar en Excel ---
+        guardar_excel(os.path.join(OUTDIR, "emg_frecuencia_mediana_ventanas_cortas.xlsx"),
+                      [tiempos_centros_corto, f_med_cortas],
+                      ["t_centro (s)", "f_med (Hz)"])
+
+        # --- Detección de fatiga ---
+        mask_valid = np.isfinite(f_med_cortas)
+        if np.count_nonzero(mask_valid) < 5:
+            print("No hay suficientes ventanas válidas para evaluar fatiga.")
+        else:
+            t_val = tiempos_centros_corto[mask_valid]
+            f_val = f_med_cortas[mask_valid]
+
+            # Pendiente de la regresión lineal (f_med vs tiempo)
+            lr = stats.linregress(t_val, f_val)
+            pendiente_hz_s = lr.slope
+            p_slope = lr.pvalue
+
+            # Dividir en bloques: 25% inicial y 25% final
+            n = len(f_val)
+            n_ini = max(1, int(np.floor(n * FRAC_INICIO)))
+            n_fin = max(1, int(np.floor(n * FRAC_FINAL)))
+            f_ini = f_val[:n_ini]
+            f_fin = f_val[-n_fin:]
+
+            # Test de Welch (inicio vs final)
+            if len(f_ini) > 1 and len(f_fin) > 1:
+                t_stat, p_ttest = stats.ttest_ind(f_ini, f_fin, equal_var=False, nan_policy='omit')
+            else:
+                t_stat, p_ttest = np.nan, np.nan
+
+            # Cálculo de medias y caída porcentual
+            f_ini_mean = np.nanmean(f_ini) if len(f_ini) else np.nan
+            f_fin_mean = np.nanmean(f_fin) if len(f_fin) else np.nan
+            caida_pct = 100.0 * (f_ini_mean - f_fin_mean) / f_ini_mean if np.isfinite(f_ini_mean) and f_ini_mean != 0 else np.nan
+
+            criterio_pendiente = (pendiente_hz_s < 0) and (p_slope < ALPHA)
+            criterio_caida = np.isfinite(caida_pct) and (caida_pct >= UMBRAL_CAIDA_PCT)
+            criterio_ttest = np.isfinite(p_ttest) and (p_ttest < ALPHA) and (f_fin_mean < f_ini_mean)
+            hay_fatiga = criterio_pendiente and (criterio_caida or criterio_ttest)
+
+            # --- Resultados en consola ---
+            print(f"Pendiente (Hz/s): {pendiente_hz_s:.5f}  (p={p_slope:.4g})")
+            print(f"f_med inicio (media): {f_ini_mean:.2f} Hz")
+            print(f"f_med final  (media): {f_fin_mean:.2f} Hz")
+            print(f"Caída porcentual: {caida_pct:.2f}% (umbral {UMBRAL_CAIDA_PCT:.1f}%)")
+            print(f"Welch inicio vs final: t={t_stat:.3f}, p={p_ttest:.4g}")
+            print(f">>> FATIGA MUSCULAR: {'SÍ' if hay_fatiga else 'NO'}")
+
+            # --- Gráfico de tendencia ---
+            plt.figure(figsize=(12, 5))
+            plt.plot(t_val, f_val, marker='.', color='b', label='f_med (ventanas cortas)')
+            plt.plot(t_val, lr.intercept + lr.slope*t_val, 'r--', label=f"Tendencia lineal (p={p_slope:.3g})")
+
+            if n_ini > 0:
+                plt.axvspan(t_val[0], t_val[n_ini-1], alpha=0.1, color='green', label='Bloque inicial')
+            if n_fin > 0:
+                plt.axvspan(t_val[-n_fin], t_val[-1], alpha=0.1, color='orange', label='Bloque final')
+
+            texto = (f"Pendiente: {pendiente_hz_s:.5f} Hz/s (p={p_slope:.3g})\n"
+                     f"Caída: {caida_pct:.2f}% | Welch p={p_ttest:.3g}\n"
+                     f"FATIGA: {'SÍ' if hay_fatiga else 'NO'}")
+
+            plt.title("Frecuencia mediana (ventanas cortas de 0.5 s)")
+            plt.xlabel("Tiempo (s)")
+            plt.ylabel("f_med (Hz)")
+            plt.grid(True)
+            plt.legend()
+            plt.annotate(texto, xy=(0.01, 0.98), xycoords='axes fraction',
+                         va='top', ha='left', bbox=dict(boxstyle="round", fc="w", ec="0.7"))
+            plt.tight_layout()
+
+            if GUARDAR_PNG:
+                plt.savefig(os.path.join(OUTDIR, "11_fmed_fatiga_ventanas_cortas.png"), dpi=200)
+            plt.show()
+
+    else:
+        print("\n[Ventanas 0.5s/50%] Señal muy corta o ventana inválida; se omite esta sección.")
+
+    print("\nListo: análisis completo. Archivos guardados en:", Path(OUTDIR).resolve())
+    
+
 
 if __name__ == "__main__":
     main()
