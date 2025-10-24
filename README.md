@@ -49,17 +49,17 @@ Suprime los bordes de manera más suave, lo que ayuda cuando se aplican muchas F
 
 Instrumentación y prepación del sujeto de prueba 
 
-* Se selecciona como músculo de análisis el Gastrocnemio, ubicado en la región posterior de la pierna encargado de la flexión plantar de pie.
-
-* EL sujeto de prueba permaneció de pie con apoyo estable, exponiendo la zona de estudio.
+* Se selecciona como músculo de análisis los trapecios que se encuentran ubicados en la espalda alta, hacia las escapulas en el lado interno.
+  
+* EL sujeto de prueba permaneció snetado de forma erguida. 
 
 * La piel fue limpiada con alcohol para eliminar grasa y residuos que se encontraban allí, garantizando buena conductividad.
 
 * Se utilizaron tres electrodos de superficie:
   
-  * Dos electrodos activos colocados longitudinalmente sobre el vientre del musculo Gastrocnemio, separados aproximadamente 2cm. En nuestro caso boton rojo y amarillo.
+  * Dos electrodos activos colocados longitudinalmente sobre el vientre de los trapecios, separados aproximadamente 2cm. En nuestro caso boton rojo y amarillo.
     
-  * Un electrodo de tierra colocado en la rodilla donde ahi zona ósea no activa, este seria el boton verde.
+  * Un electrodo de tierra colocado en el hueso de la columna donde ahi zona ósea no activa, este seria el boton verde.
 
 * Se verifica la correcta conexión al sistema de adquisición como lo es el modulo EMG y la DAQ, al software de procesamiento en Python. 
 
@@ -67,17 +67,14 @@ AL proceso se le realiza una toma fotografica para visualizar los pasos anterior
 
 ![Imagen de WhatsApp 2025-10-14 a las 16 56 44_dd302a35](https://github.com/user-attachments/assets/b636bb70-461b-48c4-9d52-3cf43fdf248f)
 
-![Imagen de WhatsApp 2025-10-14 a las 16 56 45_50e3dbd0](https://github.com/user-attachments/assets/992fb53c-5d37-4a03-ab3b-fbc765bfa701)
-
-![Imagen de WhatsApp 2025-10-14 a las 16 56 45_284d877d](https://github.com/user-attachments/assets/787a878d-0a0e-4cfb-a549-9647ae0b7a59)
-
-![Imagen de WhatsApp 2025-10-14 a las 16 56 47_7b7173d2](https://github.com/user-attachments/assets/2943a873-2744-4af5-b954-bbdb9cc2b8f0)
-
 <img width="739" height="1600" alt="image" src="https://github.com/user-attachments/assets/304c3602-09a2-434d-85df-395a7ac3d590" />
 
+<img width="1170" height="627" alt="image" src="https://github.com/user-attachments/assets/d43738a0-a9a0-4eff-9076-272a420d5bbe" />
 
-# EXPLICACION DE CODIGO 
+
+# EXPLICACIÓN DE CODIGO 
 Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
+
 # Definicion de filtro Butterworth
 
 se definen las frecuencias de corte del filtro establecidas entre 20 y 450 Hz, tambien se define la frecuencia de muestreo para la señal y la frecuencia  Nyquist obtenida de la mitad de la frecuencia de muestreo.
