@@ -71,9 +71,58 @@ AL proceso se le realiza una toma fotografica para visualizar los pasos anterior
 
 <img width="1170" height="627" alt="image" src="https://github.com/user-attachments/assets/d43738a0-a9a0-4eff-9076-272a420d5bbe" />
 
+# ADQUISICIÓN DE LA SEÑAL 
+Para la adquisicón de la señal se realiza una interfaz de adquisión directamente en Python implementando el codigo correspondiente que se encuentra adjunto a este informe. En la siguiente imagen se muestra la interfaz:
+
+<img width="785" height="632" alt="image" src="https://github.com/user-attachments/assets/178e3f6e-2bd5-4368-b1b3-a83dc24a19dd" />
+
+La frecuencia de muestreo fue de 1000 Hz, garantizando una resolución temporal suficiente para capturar los componentes de la señal electromiográfica. Durante la prueba, el sujeto realizo una contracción sostenida del gastrocnemio al ponerse repetidamente en puntas, manteniendo la posición hasta la aparición de una sensación de fatiga. 
+
+La señal fue registrada de manera continua y en tiempo real, obteniéndo un archivo excel de la señal cruda, mostrando el comportamiento inicial y el posterior filtrado digital.
+
+A partir de la adquisión de la señal se procede a implementar un codgio en Python donde se realizan los correspondientes analisis. Por lo cual a continuación se realiza la expñicación del codigo implementado:
 
 # EXPLICACIÓN DE CODIGO 
 Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
+
+```
+import os
+import numpy as np
+import pandas as pd
+from scipy import signal, fft, stats
+import matplotlib.pyplot as plt
+from scipy.fft import fftfreq
+from scipy.signal import butter, filtfilt, get_window
+from pathlib import Path
+import xlsxwriter
+
+```
+* os, Path: manejo de rutas y archivos. 
+* numpy, pandas: cálculos numéricos y manejo de datos.
+* scipy.signal, scipy.fft, scipy.stats: filtros, transformadas de Fourier (FFT) y pruebas estadísticas.
+* matplotlib.pyplot: para graficar.
+* xlsxwriter: guardar resultados en Excel.
+  
+Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
+
+```
+RUTA_CSV = "emg_cruda.csv"  # ruta del archivo de entrada
+OUTDIR = "resultados"       # carpeta donde se guardan las salidas
+HP_CORTE = 20.0             # frecuencia de corte pasa-alta [Hz]
+LP_CORTE = 450.0            # frecuencia de corte pasa-baja [Hz]
+ORDEN_FILTRO = 4            # orden de los filtros Butterworth
+WIN_SEC = 30.0              # duración de ventana larga [s]
+OVERLAP = 0.5               # solape entre ventanas largas [0–1]
+VENTANA_TIPO = "hamming"    # tipo de ventana (hann o hamming)
+BANDA_FATIGA = (20, 250)    # rango de frecuencias para f_med [Hz]
+ALPHA = 0.05                # nivel de significancia estadística
+FRAC_INICIO = 0.25          # fracción inicial para Welch test
+FRAC_FINAL = 0.25           # fracción final para Welch test
+UMBRAL_CAIDA_PCT = 5.0      # % mínimo de caída para considerar fatiga
+PLOT_VENTANAS_LARGAS = False
+GUARDAR_PNG = True
+
+```
 
 # Definicion de filtro Butterworth
 
@@ -105,17 +154,6 @@ se procede a graficar los diferentes analisis, como el de comparacion de ventana
 # Exportacion de resultados 
 
 por ultímo se exportan los resultados a una carpeta propia donde se guardan en exel los datos de la señal y calculos estadisticos y en png las graficas
-
-# ADQUISICIÓN DE LA SEÑAL 
-Para la adquisicón de la señal se realiza una interfaz de adquisión directamente en Python implementando el codigo correspondiente. En la siguiente imagen se muestra la interfaz: 
-
-<img width="785" height="632" alt="image" src="https://github.com/user-attachments/assets/178e3f6e-2bd5-4368-b1b3-a83dc24a19dd" />
-
-La frecuencia de muestreo fue de 100 Hz, garantizando una resolución temporal suficiente para capturar los componentes de la señal electromiográfica. Durante la prueba, el sujeto realizo una contracción sostenida del gastrocnemio al ponerse repetidamente en puntas, manteniendo la posición hasta la aparición de una sensación de fatiga. 
-
-La señal fue registrada de manera continua y en tiempo real, obteniéndo un archivo excel de la señal cruda, mostrando el comportamiento inicial y el posterior filtrado digital.
-
-A partir de la adquisión de la señal se procede a implementar un codgio en Python donde se realizan los correspondientes analisis. 
 
 # ANÁLISIS DE SEALES ELECTROMIOGRÁFICAS (EMG)
 
