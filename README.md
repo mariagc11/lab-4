@@ -85,72 +85,195 @@ A partir de la adquisión de la señal se procede a implementar un codgio en Pyt
 # EXPLICACIÓN DE CODIGO 
 Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
 
-```
-import os
-import numpy as np
-import pandas as pd
-from scipy import signal, fft, stats
-import matplotlib.pyplot as plt
-from scipy.fft import fftfreq
-from scipy.signal import butter, filtfilt, get_window
-from pathlib import Path
-import xlsxwriter
-
-```
-* os, Path: manejo de rutas y archivos. 
-* numpy, pandas: cálculos numéricos y manejo de datos.
-* scipy.signal, scipy.fft, scipy.stats: filtros, transformadas de Fourier (FFT) y pruebas estadísticas.
-* matplotlib.pyplot: para graficar.
-* xlsxwriter: guardar resultados en Excel.
-  
-Empezamos montando el codigo normal para la adquisicion de la señal EMG en pyton donde agregamos 7 partes importantes.
-
-```
-RUTA_CSV = "emg_cruda.csv"  # ruta del archivo de entrada
-OUTDIR = "resultados"       # carpeta donde se guardan las salidas
-HP_CORTE = 20.0             # frecuencia de corte pasa-alta [Hz]
-LP_CORTE = 450.0            # frecuencia de corte pasa-baja [Hz]
-ORDEN_FILTRO = 4            # orden de los filtros Butterworth
-WIN_SEC = 30.0              # duración de ventana larga [s]
-OVERLAP = 0.5               # solape entre ventanas largas [0–1]
-VENTANA_TIPO = "hamming"    # tipo de ventana (hann o hamming)
-BANDA_FATIGA = (20, 250)    # rango de frecuencias para f_med [Hz]
-ALPHA = 0.05                # nivel de significancia estadística
-FRAC_INICIO = 0.25          # fracción inicial para Welch test
-FRAC_FINAL = 0.25           # fracción final para Welch test
-UMBRAL_CAIDA_PCT = 5.0      # % mínimo de caída para considerar fatiga
-PLOT_VENTANAS_LARGAS = False
-GUARDAR_PNG = True
-
-```
-
 # Definicion de filtro Butterworth
+```
+# Parámetros del filtro
+fs = 1000  # Frecuencia de muestreo en Hz
+lowcut = 20   # Frecuencia de corte baja
+highcut = 450 # Frecuencia de corte alta
 
-se definen las frecuencias de corte del filtro establecidas entre 20 y 450 Hz, tambien se define la frecuencia de muestreo para la señal y la frecuencia  Nyquist obtenida de la mitad de la frecuencia de muestreo.
+# Frecuencia de Nyquist
+nyquist = 0.5 * fs
+low = lowcut / nyquist
+high = highcut / nyquist
+
+# Diseño del filtro Butterworth de cuarto orden
+from scipy.signal import butter, filtfilt
+
+b, a = butter(4, [low, high], btype='band')
+
+```
+En esta sección se diseña el filtro digital Butterworth que limpiará la señal electromiográfica.
+
+* Se fijan las frecuencias de corte en 20 y 450 Hz, que abarcan el rango útil de las señales EMG.
+
+* Se calcula la frecuencia de Nyquist, que equivale a la mitad de la frecuencia de muestreo (fs/2), y se normalizan las frecuencias de corte.
+
+* Con butter(4, [low, high], btype='band') se construye un filtro pasa banda de 4º orden, caracterizado por tener una respuesta suave y sin oscilaciones abruptas.
+
+El objetivo de este filtro es eliminar tanto el ruido de baja frecuencia (movimiento o interferencias de línea base) como el ruido de alta frecuencia (eléctrico o térmico), conservando solo las componentes musculares útiles.
+
 # Aplicacion del filtro 
+```
+# Aplicación del filtro a la señal EMG cruda
+import numpy as np
 
-Llama el filtro definido antes y lo aplica a la señal EMG optenida en su data cruda, aplicando la ecuacion del filtro punto por punto 
+emg_raw = np.loadtxt('emg_data.csv', delimiter=',')  # Lectura de la señal cruda
+
+# Eliminamos el componente DC (media)
+emg_raw = emg_raw - np.mean(emg_raw)
+
+# Aplicamos el filtro pasa banda Butterworth
+emg_bp = filtfilt(b, a, emg_raw)
+
+```
+Esta parte aplica el filtro diseñado sobre la señal EMG obtenida en formato .csv.
+Primero, se resta la media de la señal para centrarla en cero, eliminando el componente DC.
+Luego, se usa la función filtfilt() para aplicar el filtro en ambas direcciones (hacia adelante y hacia atrás), lo que evita el desfase temporal que produciría un filtrado simple.
+
+El resultado es emg_bp, una señal limpia, libre de interferencias, que conserva únicamente las frecuencias fisiológicas del músculo.
 
 # Transformada Rapida de fourier FFT
 
-en esta funcion se muestra el espectro de frecuencias en cada ventana de la señal, obteniendo asi la potencia en cada una de las ventanas mediante un vector de frecuencias 
+```
+# Aplicación del filtro a la señal EMG cruda
+import numpy as np
+
+emg_raw = np.loadtxt('emg_data.csv', delimiter=',')  # Lectura de la señal cruda
+
+# Eliminamos el componente DC (media)
+emg_raw = emg_raw - np.mean(emg_raw)
+
+# Aplicamos el filtro pasa banda Butterworth
+emg_bp = filtfilt(b, a, emg_raw)
+
+```
+Aquí se calcula la Transformada Rápida de Fourier (FFT), que convierte la señal del dominio del tiempo al dominio de la frecuencia.
+La FFT permite observar en qué frecuencias se concentra la energía de la señal EMG.
+
+El vector f contiene las frecuencias, y mag las amplitudes correspondientes.
+La gráfica resultante muestra los picos de energía que reflejan la activación muscular, permitiendo identificar si la energía se desplaza hacia frecuencias bajas (síntoma de fatiga). 
 
 # Ventaneo 
+```
+# Definición de parámetros de ventana
+win_sec = 0.5  # Duración de ventana (s)
+overlap = 0.5  # Porcentaje de solapamiento
+step = int(fs * win_sec * (1 - overlap))  # Paso de ventana
+win_size = int(fs * win_sec)
 
-En esta parte se da la separacion de la señal depfinida en un tiempo de 0.5 s y un solapamiento del 50% lo cual superpone cada ventana a la mitad para evitar la perdida de datos, de esta pmanera se puede analizas la potencia uniforme de la señal en cada momento 
+# Ventana Hamming
+from scipy.signal import get_window
+window = get_window('hamming', win_size)
+
+# División de la señal en ventanas solapadas
+segments = []
+for start in range(0, len(emg_bp) - win_size, step):
+    segment = emg_bp[start:start + win_size] * window
+    segments.append(segment)
+segments = np.array(segments)
+```
+El ventaneo consiste en dividir la señal en segmentos cortos para analizar cómo varían sus características a lo largo del tiempo.
+
+* Cada ventana tiene una duración de 0.5 segundos.
+
+* Se usa un 50% de solapamiento entre ventanas para no perder información.
+
+* Se aplica una ventana Hamming, que suaviza los bordes de cada segmento y evita fugas espectrales al hacer la FFT.
+
+El resultado es una lista de ventanas (segments), cada una lista para ser analizada individualmente.
+ 
 
 # Implementacion de las medidas estadisticas 
+```
+means = []
+stds = []
+cvs = []
 
-Con esta parte se sacan las medidas de media, desviacion estandar y coeficiente de variacion para la señal EMG donde vemos la activacion muscular y su variacion, tomando que cuando la media baja y el coeficiente de variacion aumenta se toma por fatiga muscular.
+for seg in segments:
+    mean_val = np.mean(np.abs(seg))
+    std_val = np.std(seg)
+    cv_val = std_val / mean_val if mean_val != 0 else 0
+
+    means.append(mean_val)
+    stds.append(std_val)
+    cvs.append(cv_val)
+
+```
+En cada ventana se calculan las medidas estadísticas básicas de la señal EMG:
+
+* Media: representa la amplitud media del esfuerzo muscular.
+
+* Desviación estándar: indica la variabilidad o irregularidad del esfuerzo.
+
+* Coeficiente de variación (CV): evalúa la relación entre variabilidad y magnitud.
+
+Cuando el músculo entra en fatiga, suele observarse:
+
+* Disminución de la media (menor activación).
+
+* Aumento del CV (mayor inestabilidad eléctrica).
 
 # Deteccion de fatiga
+```
+# Cálculo de frecuencia mediana en cada ventana
+from scipy.signal import welch
 
-Aca tomamos el caculo de la frecuencia media vista anteriormente y como savemso se presenta la orden de fatiga al momento en el que la media baja sabiendo que la energia se desplaza hacia frecuencias bajas 
+fmeds = []
+for seg in segments:
+    f_vals, Pxx = welch(seg, fs=fs, nperseg=win_size)
+    cum_energy = np.cumsum(Pxx)
+    fmed = f_vals[np.where(cum_energy >= cum_energy[-1] / 2)[0][0]]
+    fmeds.append(fmed)
 
+# Tendencia de la frecuencia mediana
+from scipy.stats import linregress
+
+x = np.arange(len(fmeds))
+slope, intercept, r, p_value, std_err = linregress(x, fmeds)
+
+print("Pendiente:", slope)
+print("p-valor:", p_value)
+
+```
+Aquí se realiza la detección de fatiga muscular mediante el análisis de la frecuencia mediana (f_med).
+
+* Para cada ventana, se calcula el espectro de potencia con el método de Welch, y luego se obtiene la frecuencia donde la energía acumulada alcanza el 50%.
+
+* Posteriormente, se aplica una regresión lineal a la serie temporal de f_med para observar su tendencia.
+
+* Si la pendiente (slope) es negativa y el p-valor < 0.05, significa que la disminución es estadísticamente significativa, indicando fatiga muscular.
 # Graficas 
+```
+import pandas as pd
+import os
 
-se procede a graficar los diferentes analisis, como el de comparacion de ventanas par asi distinguir los momentos de la señal EMG
+# Crear carpeta de resultados
+os.makedirs('resultados', exist_ok=True)
 
+# Guardar medidas estadísticas
+df = pd.DataFrame({
+    'Ventana': np.arange(len(means)),
+    'Media': means,
+    'DesvEst': stds,
+    'CV': cvs,
+    'Frecuencia_Mediana': fmeds
+})
+df.to_excel('resultados/analisis_emg.xlsx', index=False)
+
+# Guardar gráficas
+plt.figure()
+plt.plot(fmeds)
+plt.title('Frecuencia Mediana')
+plt.savefig('resultados/fmed.png')
+
+```
+Finalmente, todos los resultados se exportan automáticamente a una carpeta llamada resultados:
+
+* Los valores numéricos (media, desviación estándar, CV y f_med) se guardan en un archivo Excel (.xlsx) para análisis posterior.
+
+* Las gráficas se almacenan en formato PNG con nombres identificativos.
+  
 # Exportacion de resultados 
 
 por ultímo se exportan los resultados a una carpeta propia donde se guardan en exel los datos de la señal y calculos estadisticos y en png las graficas
